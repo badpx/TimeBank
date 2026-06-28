@@ -54,7 +54,9 @@ export default function TaskCard({
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 17, fontWeight: 500 }}>{task.name}</div>
         <div style={{ fontSize: 13, color: "var(--muted)" }}>
-          {task.taskMinutes} 分钟 · 奖励 {task.rewardMinutes} 分钟
+          {task.taskMinutes > 0
+            ? `${task.taskMinutes} 分钟 · 奖励 ${task.rewardMinutes} 分钟`
+            : `完成一次 · 奖励 ${task.rewardMinutes} 分钟`}
         </div>
       </div>
       <div style={{ textAlign: "right", flexShrink: 0 }}>

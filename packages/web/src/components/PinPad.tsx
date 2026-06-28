@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function PinPad({
   onSubmit,
@@ -10,6 +10,11 @@ export default function PinPad({
   shaking: boolean;
 }) {
   const [pin, setPin] = useState("");
+
+  // 错误反馈（抖动）出现时，清空已输入，方便重新输入
+  useEffect(() => {
+    if (shaking) setPin("");
+  }, [shaking]);
 
   const press = (d: string) => {
     if (pin.length >= 4) return;

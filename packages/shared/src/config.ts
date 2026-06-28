@@ -22,7 +22,9 @@ export const taskSchema = z.object({
   id: z.string().regex(/^[a-z0-9_-]+$/),
   name: z.string().min(1).max(64),
   category: z.string().min(1).max(32),
-  taskMinutes: z.number().int().positive(),
+  // taskMinutes > 0 表示时长型任务（如阅读 30 分钟）；
+  // = 0 表示一次性任务，不限时长（如整理一次房间）。
+  taskMinutes: z.number().int().nonnegative(),
   rewardMinutes: z.number().int().positive(),
   childIds: childIdList,
   dailyLimit: z.number().int().positive().default(1),

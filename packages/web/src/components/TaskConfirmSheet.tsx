@@ -47,7 +47,9 @@ export default function TaskConfirmSheet({
         <div style={{ background: "var(--bg)", borderRadius: "var(--radius-md)", padding: 16, marginBottom: 20 }}>
           <div style={{ fontSize: 18, fontWeight: 500 }}>{task.name}</div>
           <div style={{ fontSize: 14, color: "var(--muted)", marginTop: 4 }}>
-            需要 {task.taskMinutes} 分钟 · 完成后获得 {task.rewardMinutes} 分钟
+            {task.taskMinutes > 0
+              ? `需要 ${task.taskMinutes} 分钟 · 完成后获得 ${task.rewardMinutes} 分钟`
+              : `完成后获得 ${task.rewardMinutes} 分钟`}
           </div>
         </div>
         <div style={{ display: "flex", gap: 12 }}>

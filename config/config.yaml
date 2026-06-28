@@ -33,7 +33,7 @@ tasks:
   - id: cleanup
     name: 整理房间
     category: household
-    taskMinutes: 15
+    taskMinutes: 0
     rewardMinutes: 10
     childIds: ["*"]
     dailyLimit: 1

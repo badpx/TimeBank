@@ -87,7 +87,7 @@ export default function HomePage() {
             boxShadow: "var(--shadow)",
           }}
         >
-          玩时间
+          兑换时间
         </button>
         <Link
           to="/history"
@@ -103,7 +103,7 @@ export default function HomePage() {
             textDecoration: "none",
           }}
         >
-          看记录
+          查看记录
         </Link>
       </div>
 
