@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export default function PinPad({
   onSubmit,
@@ -10,6 +10,12 @@ export default function PinPad({
   shaking: boolean;
 }) {
   const [pin, setPin] = useState("");
+  // 用 ref 保存最新 pin，供键盘事件处理器读取，避免闭包过期
+  const pinRef = useRef("");
+
+  useEffect(() => {
+    pinRef.current = pin;
+  }, [pin]);
 
   // 错误反馈（抖动）出现时，清空已输入，方便重新输入
   useEffect(() => {
@@ -17,16 +23,41 @@ export default function PinPad({
   }, [shaking]);
 
   const press = (d: string) => {
-    if (pin.length >= 4) return;
-    const next = pin + d;
+    const cur = pinRef.current;
+    if (cur.length >= 4) return;
+    const next = cur + d;
     setPin(next);
+    pinRef.current = next;
     if (next.length === 4) {
       // 自动提交，稍延迟以便显示最后一位
       setTimeout(() => onSubmit(next), 120);
     }
   };
 
-  const del = () => setPin((p) => p.slice(0, -1));
+  const del = () => {
+    setPin((p) => {
+      const next = p.slice(0, -1);
+      pinRef.current = next;
+      return next;
+    });
+  };
+
+  // 键盘输入支持：数字键输入、Backspace 删除、Escape 返回
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key >= "0" && e.key <= "9") {
+        press(e.key);
+      } else if (e.key === "Backspace") {
+        del();
+      } else if (e.key === "Escape") {
+        onBack();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // press/del/onBack 通过 ref 读取最新状态，无需放入依赖
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className={shaking ? "shake" : ""} style={{ textAlign: "center" }}>
