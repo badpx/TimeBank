@@ -1,0 +1,59 @@
+# TimeBank 默认配置
+# 修改后需重启服务生效
+
+children:
+  - id: alice
+    name: 小狐
+    avatar: "🦊"
+    pin: "1234"
+    enabled: true
+  - id: bob
+    name: 小熊
+    avatar: "🐻"
+    pin: "5678"
+    enabled: true
+
+tasks:
+  - id: read
+    name: 阅读
+    category: reading
+    taskMinutes: 30
+    rewardMinutes: 15
+    childIds: ["*"]
+    dailyLimit: 2
+    enabled: true
+  - id: math
+    name: 口算练习
+    category: learning
+    taskMinutes: 20
+    rewardMinutes: 10
+    childIds: ["alice"]
+    dailyLimit: 1
+    enabled: true
+  - id: cleanup
+    name: 整理房间
+    category: household
+    taskMinutes: 15
+    rewardMinutes: 10
+    childIds: ["*"]
+    dailyLimit: 1
+    enabled: true
+
+redemptionOptions: [15, 30, 60]
+
+encouragements:
+  - "真棒！"
+  - "继续加油！"
+  - "你今天表现真好！"
+  - "太厉害啦！"
+
+session:
+  lifetimeDays: 30
+
+server:
+  host: "0.0.0.0"
+  port: 3000
+  # 会话签名密钥，请改为任意 >=16 字符的随机串
+  sessionSecret: "change-me-to-a-long-random-secret-please"
+  # 时区，缺省取系统本地。例如 "Asia/Shanghai"
+  timezone: "Asia/Shanghai"

@@ -1,0 +1,18 @@
+node_modules
+dist
+build
+coverage
+.DS_Store
+*.log
+.env
+.env.*
+!.env.example
+
+# 构建产物
+packages/server/public
+packages/*/dist
+
+# 运行时数据（保留示例结构，忽略实际数据）
+data/records/*.csv
+!data/records/.gitkeep
+backups/

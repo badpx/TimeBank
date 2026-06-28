@@ -1,0 +1,40 @@
+{
+  "name": "@timebank/server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "bin": {
+    "timebank-server": "./dist/index.js"
+  },
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "echo skip"
+  },
+  "dependencies": {
+    "@timebank/shared": "workspace:*",
+    "cookie-parser": "^1.4.7",
+    "cookie-signature": "^1.1.0",
+    "csv-parse": "^5.6.0",
+    "csv-stringify": "^6.5.2",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.4.1",
+    "js-yaml": "^4.1.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^22.10.0",
+    "supertest": "^7.0.0",
+    "@types/supertest": "^6.0.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.4"
+  }
+}
