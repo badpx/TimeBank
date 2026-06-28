@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useSession, useLogout, useBalance, useTasks, useCheckin } from "../api/hooks.js";
 import BalanceCard from "../components/BalanceCard.js";
 import TaskCard from "../components/TaskCard.js";
@@ -22,7 +22,6 @@ interface TaskView {
 export default function HomePage() {
   const { data: session } = useSession();
   const logout = useLogout();
-  const navigate = useNavigate();
   const { data: balance } = useBalance();
   const { data: tasks } = useTasks();
   const checkin = useCheckin();
@@ -38,7 +37,9 @@ export default function HomePage() {
 
   const onLogout = async () => {
     await logout.mutateAsync();
-    navigate("/login");
+    // 整页跳转：彻底清除所有 React 状态与 React Query 缓存，
+    // 避免 refetch 401 时 React Query 保留旧 session data 导致 loggedIn 仍为 true 的竞态
+    window.location.href = "/login";
   };
 
   const grouped = groupByCategory(tasks?.tasks ?? []);

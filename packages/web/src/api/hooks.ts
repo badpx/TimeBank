@@ -36,10 +36,8 @@ export function useLogin() {
 }
 
 export function useLogout() {
-  const qc = useQueryClient();
   return useMutation({
     mutationFn: api.logout,
-    onSuccess: () => qc.clear(),
   });
 }
 
