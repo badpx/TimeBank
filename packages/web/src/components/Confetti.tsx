@@ -13,7 +13,6 @@ export default function Confetti({ text }: { text: string }) {
         position: "fixed",
         top: "30%",
         left: "50%",
-        transform: "translateX(-50%)",
         background: "var(--surface)",
         borderRadius: "var(--radius-lg)",
         padding: "20px 32px",
@@ -22,8 +21,9 @@ export default function Confetti({ text }: { text: string }) {
         fontWeight: 500,
         color: "var(--primary)",
         zIndex: 60,
-        animation: "fadeIn 0.3s",
         textAlign: "center",
+        transform: "translateX(-50%)",
+        animation: "confettiPop 0.3s ease",
       }}
     >
       {text}
