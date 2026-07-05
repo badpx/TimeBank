@@ -105,10 +105,31 @@ export function filterHistory(
 
 /** 生成服务端记录 ID */
 export function generateRecordId(): string {
-  return crypto.randomUUID();
+  return uuid();
 }
 
 /** 生成客户端请求 ID（前端调用） */
 export function generateRequestId(): string {
-  return crypto.randomUUID();
+  return uuid();
+}
+
+/**
+ * UUID v4 生成。crypto.randomUUID() 仅在安全上下文（HTTPS / localhost）可用，
+ * 通过局域网 HTTP IP 访问时 iOS Safari 上 crypto.randomUUID 为 undefined。
+ * 用 crypto.getRandomValues()（所有上下文均可用）做 fallback。
+ */
+function uuid(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  const bytes = new Uint8Array(16);
+  if (typeof crypto !== "undefined" && typeof crypto.getRandomValues === "function") {
+    crypto.getRandomValues(bytes);
+  } else {
+    for (let i = 0; i < 16; i++) bytes[i] = Math.floor(Math.random() * 256);
+  }
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const h = Array.from(bytes, (b) => b.toString(16).padStart(2, "0"));
+  return `${h[0]}${h[1]}${h[2]}${h[3]}-${h[4]}${h[5]}-${h[6]}${h[7]}-${h[8]}${h[9]}-${h[10]}${h[11]}${h[12]}${h[13]}${h[14]}${h[15]}`;
 }

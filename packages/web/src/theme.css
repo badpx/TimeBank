@@ -48,6 +48,8 @@ button {
   border: none;
   background: none;
   color: inherit;
+  /* iOS Safari: 禁用双击缩放检测，让 click 立即触发 */
+  touch-action: manipulation;
 }
 
 button:disabled {

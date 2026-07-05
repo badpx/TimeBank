@@ -54,6 +54,7 @@ export default function TaskConfirmSheet({
         </div>
         <div style={{ display: "flex", gap: 12 }}>
           <button
+            type="button"
             onClick={onCancel}
             disabled={loading}
             style={{
@@ -68,6 +69,7 @@ export default function TaskConfirmSheet({
             取消
           </button>
           <button
+            type="button"
             onClick={onConfirm}
             disabled={loading}
             style={{

@@ -91,6 +91,7 @@ export default function RedemptionPanel({ onClose }: { onClose: () => void }) {
                   alignItems: "center",
                   gap: 12,
                   cursor: !busy && o.available && !isDone ? "pointer" : "default",
+                  touchAction: "manipulation",
                   opacity: !o.available && !isSelected ? 0.7 : 1,
                   border: isSelected && !isDone ? "2px solid var(--primary)" : "2px solid transparent",
                   boxSizing: "border-box",
@@ -100,6 +101,7 @@ export default function RedemptionPanel({ onClose }: { onClose: () => void }) {
                 {isDone && <span style={{ fontSize: 14 }}>✓ 已兑换</span>}
                 {showConfirm && (
                   <button
+                    type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       onConfirm(o.minutes);
@@ -134,6 +136,7 @@ export default function RedemptionPanel({ onClose }: { onClose: () => void }) {
 
         {!busy && (
           <button
+            type="button"
             onClick={onClose}
             style={{
               width: "100%",
