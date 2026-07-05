@@ -192,10 +192,10 @@ export class ChildStore {
     });
     // 确保以换行结尾
     const chunk = line.endsWith("\n") ? line : line + "\n";
-    const fh = await appendFile(this.filePath, chunk, "utf8");
-    // appendFile 已 flush；显式 sync 通过打开文件句柄 fsync 更稳妥
+    await appendFile(this.filePath, chunk, "utf8");
+    // appendFile 已将数据写入 OS 缓冲；fsync 仅用于防断电丢数据，属尽力而为。
+    // Windows 上对只读句柄 fsync 会 EPERM，故容错处理——失败不影响数据正确性。
     await syncFile(this.filePath);
-    void fh;
     this.records.push(record);
     return record;
   }
@@ -203,11 +203,17 @@ export class ChildStore {
 
 import { open } from "node:fs/promises";
 async function syncFile(filePath: string): Promise<void> {
-  const handle = await open(filePath, "r");
   try {
-    await handle.sync();
-  } finally {
-    await handle.close();
+    const handle = await open(filePath, "r");
+    try {
+      await handle.sync();
+    } finally {
+      await handle.close();
+    }
+  } catch (e) {
+    // Windows 上 fsync 可能 EPERM，数据已在 OS 缓冲，可安全忽略
+    const err = e as NodeJS.ErrnoException;
+    if (err.code !== "EPERM") console.warn("fsync 失败（不影响数据）:", err.message);
   }
 }
 
