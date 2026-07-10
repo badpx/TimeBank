@@ -15,4 +15,6 @@ packages/*/dist
 # 运行时数据（保留示例结构，忽略实际数据）
 data/records/*.csv
 !data/records/.gitkeep
+data/schedules/*.json
+!data/schedules/.gitkeep
 backups/

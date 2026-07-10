@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useSession, useLogout, useBalance, useTasks, useCheckin } from "../api/hooks.js";
+import { useSession, useLogout, useBalance, useTasks, useCheckin, useTodaySchedules } from "../api/hooks.js";
 import BalanceCard from "../components/BalanceCard.js";
 import TaskCard from "../components/TaskCard.js";
 import TaskConfirmSheet from "../components/TaskConfirmSheet.js";
@@ -25,6 +25,7 @@ export default function HomePage() {
   const { data: balance } = useBalance();
   const { data: tasks } = useTasks();
   const checkin = useCheckin();
+  const { data: todaySchedules } = useTodaySchedules();
   const [confirmTask, setConfirmTask] = useState<null | {
     id: string;
     name: string;
@@ -74,6 +75,34 @@ export default function HomePage() {
 
       <BalanceCard minutes={balance?.balanceMinutes ?? 0} />
 
+      {/* 日程提示条 */}
+      {(() => {
+        const items = todaySchedules?.items ?? [];
+        const pending = items.filter((i) => !i.isOverdue);
+        if (pending.length === 0) return null;
+        return (
+          <Link
+            to="/schedule"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginTop: 12,
+              padding: "12px 16px",
+              borderRadius: "var(--radius-md)",
+              background: "var(--primary-soft)",
+              color: "var(--primary)",
+              fontSize: 15,
+              fontWeight: 500,
+              textDecoration: "none",
+            }}
+          >
+            <span>今天还有 {pending.length} 项计划待完成</span>
+            <span>→</span>
+          </Link>
+        );
+      })()}
+
       <div style={{ display: "flex", gap: 12, marginTop: 16, marginBottom: 24 }}>
         <button
           onClick={() => setShowRedeem(true)}
@@ -83,7 +112,7 @@ export default function HomePage() {
             borderRadius: "var(--radius-md)",
             background: "var(--primary)",
             color: "white",
-            fontSize: 17,
+            fontSize: 15,
             fontWeight: 500,
             boxShadow: "var(--shadow)",
           }}
@@ -100,11 +129,29 @@ export default function HomePage() {
             background: "var(--surface)",
             color: "var(--ink)",
             fontWeight: 500,
+            fontSize: 15,
             boxShadow: "var(--shadow)",
             textDecoration: "none",
           }}
         >
           查看记录
+        </Link>
+        <Link
+          to="/schedule"
+          style={{
+            flex: 1,
+            textAlign: "center",
+            padding: "16px 0",
+            borderRadius: "var(--radius-md)",
+            background: "var(--surface)",
+            color: "var(--ink)",
+            fontWeight: 500,
+            fontSize: 15,
+            boxShadow: "var(--shadow)",
+            textDecoration: "none",
+          }}
+        >
+          我的日程
         </Link>
       </div>
 

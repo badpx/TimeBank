@@ -118,7 +118,7 @@ export function generateRequestId(): string {
  * 通过局域网 HTTP IP 访问时 iOS Safari 上 crypto.randomUUID 为 undefined。
  * 用 crypto.getRandomValues()（所有上下文均可用）做 fallback。
  */
-function uuid(): string {
+export function uuid(): string {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
     return crypto.randomUUID();
   }

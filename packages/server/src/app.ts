@@ -18,22 +18,30 @@ import {
   checkinRequestSchema,
   redeemRequestSchema,
   historyQuerySchema,
+  createScheduleRequestSchema,
+  updateScheduleRequestSchema,
+  schedulesForWeekday,
+  sortByTime,
+  isOverdueByMinutes,
+  localDateKey,
   type AppConfig,
   type Record,
 } from "@timebank/shared";
 import { ChildStore } from "./store.js";
+import { ScheduleStore, ScheduleNotFoundError } from "./schedule-store.js";
 import { SessionStore } from "./session.js";
 
 export interface AppDeps {
   config: AppConfig;
   stores: Map<string, ChildStore>;
+  scheduleStores: Map<string, ScheduleStore>;
   timezone?: string;
   /** 静态资源目录（生产构建产物），可选 */
   staticDir?: string;
 }
 
 export function createApp(deps: AppDeps): express.Express {
-  const { config, stores, timezone, staticDir } = deps;
+  const { config, stores, scheduleStores, timezone, staticDir } = deps;
   const session = new SessionStore(config);
   const app = express();
   app.use(express.json());
@@ -264,6 +272,78 @@ export function createApp(deps: AppDeps): express.Express {
       note: r.note,
     }));
     res.json({ records: items });
+  });
+
+  // ---------- 日程管理 ----------
+  app.get("/api/me/schedules", (req, res) => {
+    const childId = (req as any).sessionChildId as string;
+    const store = scheduleStores.get(childId)!;
+    res.json({ schedules: store.getAll() });
+  });
+
+  app.get("/api/me/schedules/today", (req, res) => {
+    const childId = (req as any).sessionChildId as string;
+    const store = scheduleStores.get(childId)!;
+    const now = new Date();
+    // 本地星期几：JS getDay() 0=周日 → 转为 1-7（1=周一）
+    const jsDay = now.getDay();
+    const weekday = jsDay === 0 ? 7 : jsDay;
+    const nowMin = now.getHours() * 60 + now.getMinutes();
+    const today = schedulesForWeekday(store.getAll(), weekday);
+    const sorted = sortByTime(today);
+    const items = sorted.map((s) => ({
+      ...s,
+      isOverdue: isOverdueByMinutes(s, nowMin),
+    }));
+    res.json({
+      items,
+      date: localDateKey(now.toISOString(), timezone),
+      weekday,
+    });
+  });
+
+  app.post("/api/me/schedules", async (req, res) => {
+    const childId = (req as any).sessionChildId as string;
+    const parsed = createScheduleRequestSchema.safeParse(req.body);
+    if (!parsed.success) return sendError(res, 400, "bad_request", "输入有误");
+    const store = scheduleStores.get(childId)!;
+    try {
+      const created = await store.create(parsed.data);
+      res.status(201).json(created);
+    } catch (e) {
+      console.error("schedule create failed", e);
+      return sendError(res, 500, "write_failed", "保存失败了，请重试");
+    }
+  });
+
+  app.put("/api/me/schedules/:id", async (req, res) => {
+    const childId = (req as any).sessionChildId as string;
+    const parsed = updateScheduleRequestSchema.safeParse(req.body);
+    if (!parsed.success) return sendError(res, 400, "bad_request", "输入有误");
+    const store = scheduleStores.get(childId)!;
+    try {
+      const updated = await store.update(req.params.id, parsed.data);
+      res.json(updated);
+    } catch (e) {
+      if (e instanceof ScheduleNotFoundError)
+        return sendError(res, 404, "not_found", "日程不存在");
+      console.error("schedule update failed", e);
+      return sendError(res, 500, "write_failed", "保存失败了，请重试");
+    }
+  });
+
+  app.delete("/api/me/schedules/:id", async (req, res) => {
+    const childId = (req as any).sessionChildId as string;
+    const store = scheduleStores.get(childId)!;
+    try {
+      await store.remove(req.params.id);
+      res.status(204).end();
+    } catch (e) {
+      if (e instanceof ScheduleNotFoundError)
+        return sendError(res, 404, "not_found", "日程不存在");
+      console.error("schedule delete failed", e);
+      return sendError(res, 500, "write_failed", "删除失败了，请重试");
+    }
   });
 
   // ---------- 静态资源 ----------

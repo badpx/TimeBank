@@ -113,3 +113,37 @@ export type HistoryQuery = z.infer<typeof historyQuerySchema>;
 export type HistoryItem = z.infer<typeof historyItemSchema>;
 export type HistoryResponse = z.infer<typeof historyResponseSchema>;
 export type ErrorResponse = z.infer<typeof errorResponseSchema>;
+
+// ── 日程管理 ──
+
+export const scheduleItemResponseSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  weekdays: z.array(z.number().int()),
+  startTime: z.string(),
+  endTime: z.string(),
+  color: z.string(),
+  note: z.string(),
+  enabled: z.boolean(),
+  createdAt: z.string(),
+});
+
+export const schedulesResponseSchema = z.object({
+  schedules: z.array(scheduleItemResponseSchema),
+});
+
+/** 今日日程项（含是否已过时） */
+export const todayScheduleItemSchema = scheduleItemResponseSchema.extend({
+  isOverdue: z.boolean(),
+});
+
+export const todaySchedulesResponseSchema = z.object({
+  items: z.array(todayScheduleItemSchema),
+  date: z.string(),
+  weekday: z.number().int(),
+});
+
+export type ScheduleItemResponse = z.infer<typeof scheduleItemResponseSchema>;
+export type SchedulesResponse = z.infer<typeof schedulesResponseSchema>;
+export type TodayScheduleItem = z.infer<typeof todayScheduleItemSchema>;
+export type TodaySchedulesResponse = z.infer<typeof todaySchedulesResponseSchema>;

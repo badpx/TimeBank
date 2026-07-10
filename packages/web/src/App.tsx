@@ -3,6 +3,7 @@ import { useSession } from "./api/hooks.js";
 import LoginPage from "./pages/LoginPage.js";
 import HomePage from "./pages/HomePage.js";
 import HistoryPage from "./pages/HistoryPage.js";
+import SchedulePage from "./pages/SchedulePage.js";
 
 export default function App() {
   const { data, isLoading } = useSession();
@@ -20,6 +21,7 @@ export default function App() {
       />
       <Route path="/" element={loggedIn ? <HomePage /> : <Navigate to="/login" replace />} />
       <Route path="/history" element={loggedIn ? <HistoryPage /> : <Navigate to="/login" replace />} />
+      <Route path="/schedule" element={loggedIn ? <SchedulePage /> : <Navigate to="/login" replace />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

@@ -9,6 +9,11 @@ import type {
   RedeemRequest,
   RedeemResponse,
   HistoryResponse,
+  SchedulesResponse,
+  TodaySchedulesResponse,
+  ScheduleItemResponse,
+  CreateScheduleRequest,
+  UpdateScheduleRequest,
 } from "@timebank/shared";
 
 const BASE = "";
@@ -70,4 +75,18 @@ export const api = {
     if (params.type) q.set("type", params.type);
     return http<HistoryResponse>(`/api/me/history?${q.toString()}`);
   },
+  getSchedules: () => http<SchedulesResponse>("/api/me/schedules"),
+  getTodaySchedules: () => http<TodaySchedulesResponse>("/api/me/schedules/today"),
+  createSchedule: (body: CreateScheduleRequest) =>
+    http<ScheduleItemResponse>("/api/me/schedules", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+  updateSchedule: (id: string, body: UpdateScheduleRequest) =>
+    http<ScheduleItemResponse>(`/api/me/schedules/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(body),
+    }),
+  deleteSchedule: (id: string) =>
+    http<void>(`/api/me/schedules/${id}`, { method: "DELETE" }),
 };

@@ -6,6 +6,7 @@ import os from "node:os";
 import request from "supertest";
 import { createApp } from "../src/app.js";
 import { ChildStore } from "../src/store.js";
+import { ScheduleStore } from "../src/schedule-store.js";
 import type { AppConfig } from "@timebank/shared";
 
 const TZ = "Asia/Shanghai";
@@ -58,13 +59,25 @@ async function setupStores(dir: string, childIds: string[]) {
   return stores;
 }
 
+async function setupScheduleStores(dir: string, config: AppConfig, childIds: string[]) {
+  const stores = new Map<string, ScheduleStore>();
+  for (const id of childIds) {
+    const store = new ScheduleStore(id, path.join(dir, `${id}.json`), config);
+    await store.load();
+    stores.set(id, store);
+  }
+  return stores;
+}
+
 describe("integration: auth & business", () => {
   let tmp: string;
   let stores: Map<string, ChildStore>;
+  let scheduleStores: Map<string, ScheduleStore>;
 
   beforeEach(async () => {
     tmp = await mkdtemp();
     stores = await setupStores(tmp, ["alice", "bob"]);
+    scheduleStores = await setupScheduleStores(tmp, baseConfig, ["alice", "bob"]);
   });
 
   afterEach(async () => {
@@ -72,7 +85,7 @@ describe("integration: auth & business", () => {
   });
 
   function app() {
-    return createApp({ config: baseConfig, stores, timezone: TZ });
+    return createApp({ config: baseConfig, stores, scheduleStores, timezone: TZ });
   }
 
   async function loginAs(childId: string, pin: string) {
